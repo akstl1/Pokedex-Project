@@ -10,25 +10,33 @@ import requests
 
 app = dash.Dash()
 
+# get the total count of pokemon from pokeAPI, store as string variable
 poke_count=requests.get("https://pokeapi.co/api/v2/pokemon-species")
 poke_count_str = str(poke_count.json()['count'])
+
+# request json object with names of all pokemon, using the upper limit of pokemon above
 poke_names_json_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/?offset=0&limit="+poke_count_str)
+#store request in a variable as json
 poke_names_request_response = poke_names_json_request.json()
+
+# create empty list to store pokemon names, loop through request response to populate the list
 poke_names_list = []
 for name in poke_names_request_response['results']:
     poke_names_list.append(name['name'])
+
+# create app layout
 
 app.layout = html.Div([
     html.Div([
                 dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur'),
                 html.P(id='pokemon-description')
-                # html.H1(id='poke-name'),
-                # html.H1(id='poke-ability'),
-                # html.H1(id='poke-type'),
-                # html.H1(id='poke-height'),
-                # html.H1(id='poke-weight'),
-                # html.H1(id='poke-stat'),
-                # html.H1(id='poke-hapiness')
+                # html.P(id='poke-name'),
+                # html.P(id='poke-ability'),
+                # html.P(id='poke-type'),
+                # html.P(id='poke-height'),
+                # html.P(id='poke-weight'),
+                # html.P(id='poke-stat'),
+                # html.P(id='poke-hapiness')
 ])
 ])
 
