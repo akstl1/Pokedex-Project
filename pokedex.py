@@ -10,33 +10,36 @@ import requests
 
 app = dash.Dash()
 
-poke_names = ['bulbasaur','charmander','charmeleon']
+poke_count=requests.get("https://pokeapi.co/api/v2/pokemon-species")
+poke_count_str = str(poke_count.json()['count'])
+poke_names_json_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/?offset=0&limit="+poke_count_str)
+poke_names_request_response = poke_names_json_request.json()
+poke_names_list = []
+for name in poke_names_request_response['results']:
+    poke_names_list.append(name['name'])
 
 app.layout = html.Div([
     html.Div([
-                dcc.Dropdown(id='pokemon_name',options=[{'label':i.capitalize(),'value':i} for i in poke_names], value='bulbasaur'),
-    # dcc.Input(id='poke-in',value='1'),
-    # html.Button(id='submit-button',n_clicks=0,children='Submit Here', style={'fontSize':24}),
-                html.H1(id='poke-out')
+                dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur'),
+                html.P(id='pokemon-description')
+                # html.H1(id='poke-name'),
+                # html.H1(id='poke-ability'),
+                # html.H1(id='poke-type'),
+                # html.H1(id='poke-height'),
+                # html.H1(id='poke-weight'),
+                # html.H1(id='poke-stat'),
+                # html.H1(id='poke-hapiness')
 ])
 ])
 
-@app.callback(Output('poke-out','children'),
-                [Input('pokemon_name', 'value')],
-                # [State('poke-in','value')]
+@app.callback(Output('pokemon-description','children'),
+                [Input('pokemon-name', 'value')],
 )
-def output(pokemon_input):
-    poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+pokemon_input+"/")
+def description(poke_input):
+    poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+str(poke_input)+"/")
     json_data = poke_request.json()
-    # name=
-    # ability=
-    # type=
-    # height=
-    # weight=
-    # stat=
+    print(json_data['flavor_text_entries'][0]['flavor_text'])
     entry=json_data['flavor_text_entries'][0]['flavor_text'].replace('\x0c',' ')
-    print(entry)
-    hapiness = json_data['base_happiness']
     return "Pokemon's Entry is: {}".format(entry)
 
 
