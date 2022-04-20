@@ -32,7 +32,7 @@ app.layout = html.Div([
                 html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto'}),
                 html.Div([html.H1(id='pokemon-name-id')], style={'text-align':'center'}),
                 html.Div([
-                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'50%','background-color':'Green' }),
+                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'30%','background-color':'Green' }),
                     html.Div([
                         html.Div([html.P(id='pokemon-description'),
                         html.Div([
@@ -40,10 +40,10 @@ app.layout = html.Div([
                             html.Div([html.P(id='pokemon-weight')], style={'display':'inline-block'})
                             ])
                             ]),
-                            html.P(id='pokemon-ability')], style={'display':'inline-block', 'width':'50%', 'background-color':'Cyan', 'vertical-align':'top', 'margin-top':'150px'})
+                            html.P(id='pokemon-ability')], style={'display':'inline-block', 'width':'50%', 'background-color':'Cyan', 'vertical-align':'top'})
                     ], style={'display':'inline-block','background-color':'Red'}),
-                html.P(id='pokemon-type'),
-                html.P(id='pokemon-stat')
+                html.Div([html.P(id='pokemon-type')], style={'background-color':'Orange'}),
+                html.Div([html.P(id='pokemon-stat')], style={'background-color':'Pink'})
 
 ])
 ], style={'background-color':'LightCyan'})
@@ -123,14 +123,14 @@ def stats(poke_input):
         stats.append([stat['stat']['name'], stat['base_stat']])
     return "Pokemon's Stats are: {}".format(stats)
 
-@app.callback(Output('pokemon-sprite','src'),
+@app.callback(Output('pokemon-sprite','src'),Output('pokemon-sprite','style'),
                 [Input('pokemon-name', 'value')],
 )
 def sprite(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+str(poke_input)+"/")
     json_data = poke_request.json()
     id=str(json_data['id'])
-    return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png"
+    return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png", {'width':'50%', 'text-align':'center'}
 
 
 if __name__=="__main__":
