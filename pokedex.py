@@ -28,17 +28,25 @@ for name in poke_names_request_response['results']:
 
 app.layout = html.Div([
     html.Div([
-                dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur'),
-                html.P(id='pokemon-name-id'),
-                html.P(id='pokemon-description'),
-                html.P(id='pokemon-ability'),
+                html.Hr(),
+                html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto'}),
+                html.Div([html.H1(id='pokemon-name-id')], style={'text-align':'center'}),
+                html.Div([
+                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'50%','background-color':'Green' }),
+                    html.Div([
+                        html.Div([html.P(id='pokemon-description'),
+                        html.Div([
+                            html.Div([html.P(id='pokemon-height')],style={'display':'inline-block'}),
+                            html.Div([html.P(id='pokemon-weight')], style={'display':'inline-block'})
+                            ])
+                            ]),
+                            html.P(id='pokemon-ability')], style={'display':'inline-block', 'width':'50%', 'background-color':'Cyan', 'vertical-align':'top', 'margin-top':'150px'})
+                    ], style={'display':'inline-block','background-color':'Red'}),
                 html.P(id='pokemon-type'),
-                html.P(id='pokemon-height'),
-                html.P(id='pokemon-weight'),
-                html.P(id='pokemon-stat'),
-                html.Img(id="pokemon-sprite")
+                html.P(id='pokemon-stat')
+
 ])
-])
+], style={'background-color':'LightCyan'})
 
 @app.callback(Output('pokemon-name-id','children'),
                 [Input('pokemon-name', 'value')],
@@ -46,11 +54,11 @@ app.layout = html.Div([
 def name_and_id(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+str(poke_input)+"/")
     json_data = poke_request.json()
-    name=json_data['name']
+    name=json_data['name'].capitalize()
     id=str(json_data['id'])
     while len(id)<3:
         id='0'+id
-    return "Pokemon's Name and ID is: {} #{}".format(name, id)
+    return "{} #{}".format(name, id)
 
 @app.callback(Output('pokemon-description','children'),
                 [Input('pokemon-name', 'value')],
@@ -83,7 +91,7 @@ def types(poke_input):
     types = []
     for type in types_json:
         types.append(type['type']['name'])
-    return "Pokemon's Abilities are: {}".format(types)
+    return "Pokemon's Types are: {}".format(types)
 
 @app.callback(Output('pokemon-height','children'),
                 [Input('pokemon-name', 'value')],
@@ -101,7 +109,7 @@ def weight(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
     json_data = poke_request.json()
     weight=json_data['weight']/10
-    return "Pokemon's Weight is: {} kg".format(weight)
+    return html.P("Pokemon's Weight is: {} kg".format(weight))
 
 @app.callback(Output('pokemon-stat','children'),
                 [Input('pokemon-name', 'value')],
