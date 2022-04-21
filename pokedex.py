@@ -30,7 +30,7 @@ for name in poke_names_request_response['results']:
 app.layout = html.Div([
     html.Div([
                 html.Hr(),
-                html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto'}),
+                html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto', 'color':'Pink'}),
                 html.Div([html.H1(id='pokemon-name-id')], style={'text-align':'center'}),
                 html.Div([
                     html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'30%','background-color':'Green', 'margin-right':'10px', 'text-align':'center' }),
@@ -41,11 +41,13 @@ app.layout = html.Div([
                             html.Div([html.P(id='pokemon-weight')], style={'display':'inline-block'})
                             ])
                             ]),
-                            html.P(id='pokemon-ability')], style={'display':'inline-block', 'width':'30%','background-color':'Cyan', 'vertical-align':'top'})
+                            html.P(id='pokemon-ability'),
+                            html.P(id='pokemon-type')], style={'display':'inline-block', 'width':'30%','background-color':'Cyan', 'vertical-align':'top'}),
+
                     ], style={'background-color':'Red'}),
-                html.Div([html.P(id='pokemon-type')], style={'background-color':'Orange'}),
-                html.Div([html.P(id='pokemon-stat')], style={'background-color':'Pink'}),
-                dcc.Graph(id='graph')
+                # html.Div([html.P(id='pokemon-type')], style={'background-color':'Orange'}),
+                # html.Div([html.P(id='pokemon-stat')], style={'background-color':'Pink'}),
+                html.Div([dcc.Graph(id='graph')],style={'width':'50%', 'height':'400px'})
 
 ])
 ], style={'background-color':'LightCyan'})
@@ -80,8 +82,9 @@ def ability(poke_input):
     abilities_json=json_data['abilities']
     abilities = []
     for ability in abilities_json:
-        abilities.append(ability['ability']['name'])
-    return "Pokemon's Abilities are: {}".format(abilities)
+        abilities.append(ability['ability']['name'].capitalize())
+    return "Pokemon's Abilities are: "+', '.join(abilities)
+    # return "Pokemon's Abilities are: {}".format(abilities)
 
 @app.callback(Output('pokemon-type','children'),
                 [Input('pokemon-name', 'value')],
@@ -92,8 +95,8 @@ def types(poke_input):
     types_json=json_data['types']
     types = []
     for type in types_json:
-        types.append(type['type']['name'])
-    return "Pokemon's Types are: {}".format(types)
+        types.append(type['type']['name'].capitalize())
+    return "Pokemon's Types are: "+', '.join(types)
 
 @app.callback(Output('pokemon-height','children'),
                 [Input('pokemon-name', 'value')],
@@ -123,7 +126,8 @@ def stats(poke_input):
     stats=[]
     for stat in stats_json:
         stats.append([stat['stat']['name'], stat['base_stat']])
-    return "Pokemon's Stats are: {}".format(stats)
+    return ','.join(stats)
+    # return "Pokemon's Stats are: {}".format(stats)
 
 @app.callback(Output('pokemon-sprite','src'),Output('pokemon-sprite','style'),
                 [Input('pokemon-name', 'value')],
@@ -149,21 +153,6 @@ def update_figure(poke_input):
     fig = px.bar(df, x="Stat", y="Base Value",
                  )
     return fig
-    #
-    # traces = []
-    # traces.append(go.Scatter(
-    # x = df_by_continent["gdpPercap"],
-    # y = df_by_continent["lifeExp"],
-    # mode='markers',
-    # opacity=0.7,
-    # marker={'size':15},
-    # name=continent_name
-    # ))
-    #
-    # return {'data':traces,
-    #         'layout':go.Layout(title='My Plot',
-    #                             xaxis={'title': 'GDP Per Cap', 'type':'log'},
-    #                             yaxis={'title':'Life Expectancy'})}
 
 
 if __name__=="__main__":
