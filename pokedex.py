@@ -7,6 +7,7 @@ import pandas as pd
 import plotly.graph_objs as go
 from dash.dependencies import Input, Output, State
 import requests
+import plotly.express as px
 
 app = dash.Dash()
 
@@ -32,7 +33,7 @@ app.layout = html.Div([
                 html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto'}),
                 html.Div([html.H1(id='pokemon-name-id')], style={'text-align':'center'}),
                 html.Div([
-                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'30%','background-color':'Green' }),
+                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'30%','background-color':'Green', 'margin-right':'10px', 'text-align':'center' }),
                     html.Div([
                         html.Div([html.P(id='pokemon-description'),
                         html.Div([
@@ -40,10 +41,11 @@ app.layout = html.Div([
                             html.Div([html.P(id='pokemon-weight')], style={'display':'inline-block'})
                             ])
                             ]),
-                            html.P(id='pokemon-ability')], style={'display':'inline-block', 'width':'50%', 'background-color':'Cyan', 'vertical-align':'top'})
-                    ], style={'display':'inline-block','background-color':'Red'}),
+                            html.P(id='pokemon-ability')], style={'display':'inline-block', 'width':'30%','background-color':'Cyan', 'vertical-align':'top'})
+                    ], style={'background-color':'Red'}),
                 html.Div([html.P(id='pokemon-type')], style={'background-color':'Orange'}),
-                html.Div([html.P(id='pokemon-stat')], style={'background-color':'Pink'})
+                html.Div([html.P(id='pokemon-stat')], style={'background-color':'Pink'}),
+                dcc.Graph(id='graph')
 
 ])
 ], style={'background-color':'LightCyan'})
@@ -130,7 +132,38 @@ def sprite(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+str(poke_input)+"/")
     json_data = poke_request.json()
     id=str(json_data['id'])
-    return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png", {'width':'50%', 'text-align':'center'}
+    return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png", {'width':'200px', 'text-align':'center'}
+
+@app.callback(Output('graph', 'figure'),
+                [Input('pokemon-name','value')])
+
+def update_figure(poke_input):
+    poke_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
+    json_data = poke_request.json()
+    stats_json=json_data['stats']
+    stats=[]
+    for stat in stats_json:
+        stats.append([stat['stat']['name'], stat['base_stat']])
+    df = pd.DataFrame(stats, columns = ['Stat', 'Base Value'])
+
+    fig = px.bar(df, x="Stat", y="Base Value",
+                 )
+    return fig
+    #
+    # traces = []
+    # traces.append(go.Scatter(
+    # x = df_by_continent["gdpPercap"],
+    # y = df_by_continent["lifeExp"],
+    # mode='markers',
+    # opacity=0.7,
+    # marker={'size':15},
+    # name=continent_name
+    # ))
+    #
+    # return {'data':traces,
+    #         'layout':go.Layout(title='My Plot',
+    #                             xaxis={'title': 'GDP Per Cap', 'type':'log'},
+    #                             yaxis={'title':'Life Expectancy'})}
 
 
 if __name__=="__main__":
