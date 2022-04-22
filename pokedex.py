@@ -30,27 +30,28 @@ for name in poke_names_request_response['results']:
 app.layout = html.Div([
     html.Div([
                 html.Hr(),
-                html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto', 'color':'Pink'}),
+                html.Div([dcc.Dropdown(id='pokemon-name',options=[{'label':i.capitalize(),'value':i} for i in poke_names_list], value='bulbasaur')],style={'width':'20%', 'margin-left':'auto','margin-right':'auto'}),
                 html.Div([html.H1(id='pokemon-name-id')], style={'text-align':'center'}),
                 html.Div([
-                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'30%','background-color':'Green', 'margin-right':'10px', 'text-align':'center' }),
+                    html.Div([html.Img(id="pokemon-sprite")],style={'display':'inline-block', 'width':'20%','height':'300px', 'margin-right':'60px','margin-left':'80px', 'text-align':'center','vertical-align':'top' }),
                     html.Div([
                         html.Div([html.P(id='pokemon-description'),
                         html.Div([
-                            html.Div([html.P(id='pokemon-height')],style={'display':'inline-block'}),
-                            html.Div([html.P(id='pokemon-weight')], style={'display':'inline-block'})
+                            html.Div([html.P(id='pokemon-height')]),
+                            html.Div([html.P(id='pokemon-weight')])
                             ])
                             ]),
                             html.P(id='pokemon-ability'),
-                            html.P(id='pokemon-type')], style={'display':'inline-block', 'width':'30%','background-color':'Cyan', 'vertical-align':'top'}),
+                            html.P(id='pokemon-type')], style={'display':'inline-block', 'width':'30%','height':'300px','background-color':'#30a7d7', 'vertical-align':'top', 'padding-left':'10px','padding-right':'10px', 'border-radius':'10px'}),
+                            html.Div([dcc.Graph(id='graph')], style={'display':'inline-block','width':'30%', 'margin-left':'40px'})
 
-                    ], style={'background-color':'Red'}),
+                    ], style={'height':'300px'}),
                 # html.Div([html.P(id='pokemon-type')], style={'background-color':'Orange'}),
                 # html.Div([html.P(id='pokemon-stat')], style={'background-color':'Pink'}),
-                html.Div([dcc.Graph(id='graph')],style={'width':'50%', 'height':'400px'})
+                # html.Div([dcc.Graph(id='graph')],style={'width':'50%', 'height':'400px'})
 
 ])
-], style={'background-color':'LightCyan'})
+], style={'background-color':'LightCyan', 'padding-bottom':'275px'})
 
 @app.callback(Output('pokemon-name-id','children'),
                 [Input('pokemon-name', 'value')],
@@ -71,7 +72,7 @@ def description(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+str(poke_input)+"/")
     json_data = poke_request.json()
     entry=json_data['flavor_text_entries'][0]['flavor_text'].replace('\x0c',' ')
-    return "Pokemon's Entry is: {}".format(entry)
+    return "Description: {}".format(entry)
 
 @app.callback(Output('pokemon-ability','children'),
                 [Input('pokemon-name', 'value')],
@@ -83,7 +84,7 @@ def ability(poke_input):
     abilities = []
     for ability in abilities_json:
         abilities.append(ability['ability']['name'].capitalize())
-    return "Pokemon's Abilities are: "+', '.join(abilities)
+    return "Abilities: "+', '.join(abilities)
     # return "Pokemon's Abilities are: {}".format(abilities)
 
 @app.callback(Output('pokemon-type','children'),
@@ -96,7 +97,7 @@ def types(poke_input):
     types = []
     for type in types_json:
         types.append(type['type']['name'].capitalize())
-    return "Pokemon's Types are: "+', '.join(types)
+    return "Types: "+', '.join(types)
 
 @app.callback(Output('pokemon-height','children'),
                 [Input('pokemon-name', 'value')],
@@ -105,7 +106,7 @@ def height(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
     json_data = poke_request.json()
     height=json_data['height']/10
-    return "Pokemon's Height is: {} m".format(height)
+    return "Height: {} m".format(height)
 
 @app.callback(Output('pokemon-weight','children'),
                 [Input('pokemon-name', 'value')],
@@ -114,7 +115,7 @@ def weight(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
     json_data = poke_request.json()
     weight=json_data['weight']/10
-    return html.P("Pokemon's Weight is: {} kg".format(weight))
+    return html.P("Weight: {} kg".format(weight))
 
 @app.callback(Output('pokemon-stat','children'),
                 [Input('pokemon-name', 'value')],
@@ -136,7 +137,7 @@ def sprite(poke_input):
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon-species/"+str(poke_input)+"/")
     json_data = poke_request.json()
     id=str(json_data['id'])
-    return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png", {'width':'200px', 'text-align':'center'}
+    return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png", {'width':'275px', 'text-align':'center'}
 
 @app.callback(Output('graph', 'figure'),
                 [Input('pokemon-name','value')])
@@ -150,10 +151,27 @@ def update_figure(poke_input):
         stats.append([stat['stat']['name'], stat['base_stat']])
     df = pd.DataFrame(stats, columns = ['Stat', 'Base Value'])
 
-    fig = px.bar(df, x="Stat", y="Base Value",
+    fig = px.bar(df, x="Stat", y="Base Value",text_auto=True
                  )
+    fig.update_yaxes(range=[0, 270])
+
     return fig
 
+@app.callback(Output('graph', 'style'),
+                [Input('pokemon-name','value')])
+
+def update_figure_style(poke_input):
+    # poke_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
+    # json_data = poke_request.json()
+    # stats_json=json_data['stats']
+    # stats=[]
+    # for stat in stats_json:
+    #     stats.append([stat['stat']['name'], stat['base_stat']])
+    # df = pd.DataFrame(stats, columns = ['Stat', 'Base Value'])
+    #
+    # fig = px.bar(df, x="Stat", y="Base Value",
+    #              )
+    return {'height':'300px'}
 
 if __name__=="__main__":
     app.run_server()
