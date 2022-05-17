@@ -1,1 +1,1 @@
-web: gunicorn pokedex:app.server
+web: gunicorn pokedex:server
