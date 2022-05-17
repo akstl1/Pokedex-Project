@@ -20,7 +20,7 @@ poke_names_json_request = requests.get("https://pokeapi.co/api/v2/pokemon-specie
 #store request in a variable as json
 poke_names_request_response = poke_names_json_request.json()
 
-# create empty list to store pokemon names, loop through request response to populate the list
+# create empty list to store pokemon names, loop through request response to populate the list_
 poke_names_list = []
 for name in poke_names_request_response['results']:
     poke_names_list.append(name['name'])
