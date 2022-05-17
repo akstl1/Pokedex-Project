@@ -51,7 +51,7 @@ app.layout = html.Div([
 ])
 ], style={'background-color':'LightCyan', 'padding-bottom':'275px'})
 
-#create callback to get pokemon stats
+#create callback to get pokemon stats for above elements
 
 @app.callback(Output('pokemon-name-id','children'),
               Output('pokemon-description','children'),
@@ -107,16 +107,21 @@ def name_and_id(poke_input):
     ## return statement
     return "{} #{}".format(name, id),"Description: {}".format(entry),"Abilities: "+', '.join(abilities),"Types: "+', '.join(types),"Height: {} m".format(height),"Weight: {} kg".format(weight),"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/"+id+".png", {'width':'275px', 'text-align':'center'}
 
+# create callback and function to generate base stats graph
+
 @app.callback(Output('graph', 'figure'),
               Output('graph', 'style'),
               [Input('pokemon-name','value')])
 def update_figure(poke_input):
+    #get data
     poke_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
     json_data = poke_request.json()
     stats_json=json_data['stats']
     stats=[]
+    #cycle through data and append it to the stats list
     for stat in stats_json:
         stats.append([stat['stat']['name'], stat['base_stat']])
+    # generate df with the stats list data, generate bar plot
     df = pd.DataFrame(stats, columns = ['Stat', 'Base Value'])
     fig = px.bar(df, x="Stat", y="Base Value",text_auto=True)
     fig.update_yaxes(range=[0, 270])
