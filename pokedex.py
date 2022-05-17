@@ -10,7 +10,7 @@ import requests
 import plotly.express as px
 
 app = dash.Dash()
-
+server=app.server
 # get the total count of pokemon from pokeAPI, store as string variable
 poke_count=requests.get("https://pokeapi.co/api/v2/pokemon-species")
 poke_count_str = str(poke_count.json()['count'])
