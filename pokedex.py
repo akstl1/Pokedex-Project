@@ -74,7 +74,7 @@ def name_and_id(poke_input):
     pokemon_request = requests.get("https://pokeapi.co/api/v2/pokemon/"+str(poke_input)+"/")
     pokemon_data = pokemon_request.json()
 
-    ## Name And Id callback
+    ## Name And Id callback_
     name=species_data['name'].capitalize()
     id=str(species_data['id'])
     while len(id)<3:
