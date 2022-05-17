@@ -101,7 +101,7 @@ def name_and_id(poke_input):
     ## Weight Data
     weight=pokemon_data['height']/10
 
-    ## Sprite Data
+    ## Sprite Data_
     id=str(species_data['id'])
 
     ## return statement
