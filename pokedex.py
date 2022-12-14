@@ -26,7 +26,7 @@ for name in poke_names_request_response['results']:
     poke_names_list.append(name['name'])
 
 # create app layout
-
+# dummy line of text
 app.layout = html.Div([
     html.Div([
                 html.Hr(),
